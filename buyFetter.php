@@ -190,6 +190,7 @@ class app {
 
             switch ($result['error']['message']) {
                 case 'ErrLowMoney app_error':
+case 'SalveAreLocked app_error':
                     self::outputString([
                         'Ошибка!',
                         'Сообщение ошибки: ' . $result['error']['message'],
