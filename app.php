@@ -200,13 +200,28 @@ class app {
                     return self::buySlave();
                     break;
 
+                case 'ErrFloodFetter app_error':
+                    $randomTime = mt_rand(300, 5400);
+                    self::outputString([
+                        'Ошибка!',
+                        'Сообщение ошибки: ' . $result['error']['message'],
+                        'Код ошибки: ' . $result['error']['code'],
+                        'Приостановка скрипта на ' . ceil($randomTime / 60) . ' минут!'
+                    ]);
+                    self::antiFlood($randomTime);
+
+                    self::outputString(['Повторный запрос']);
+                    return self::sendRequest($url, $data);
+                    break;
+
                 default:
                     $randomTime = mt_rand(60, 120);
                     self::outputString([
                         'Ошибка!',
                         'Сообщение ошибки: ' . $result['error']['message'],
                         'Код ошибки: ' . $result['error']['code'],
-                        'Приостановка скрипта на ' . $randomTime . ' секунд!'
+                        'Приостановка скрипта на ' . $randomTime . ' секунд!',
+                        'Неизвестная ошибка, отправьте текст в issue!'
                     ]);
                     self::antiFlood($randomTime);
 
