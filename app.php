@@ -1,17 +1,26 @@
 <?php
 
 $Slaves = new app(
-    'Bearer ........',
-    'Скрипт на пхп!'
+    'Bearer .....',
+    't.me/vyxelfan'
 );
-while (true) {
-    $Slaves->buySlave();
-    $Slaves->jobSlave();
-    $Slaves->buyFetter();
 
-    $Slaves->getSlavesWithoutFetter(function ($slave_id) use ($Slaves) {
-        $Slaves->buyFetter($slave_id);
-    });
+while (true) {
+    $buySlave = $Slaves->buySlave();
+    printf(
+        "\n\tВ минуту: %s" . "\tБаланс: %s\n" .
+            "\tРабов: %s" . "\tМесто в топе: %s",
+        $buySlave['profit_per_min'],
+        $buySlave['balance'],
+        $buySlave['slaves_count'],
+        $buySlave['rating_position']
+    );
+    $Slaves->jobSlave();
+    // $Slaves->buyFetter();
+
+    // $Slaves->getSlavesWithoutFetter(function ($slave_id) use ($Slaves) {
+    //     $Slaves->buyFetter($slave_id);
+    // });
 }
 
 class app {
@@ -56,6 +65,8 @@ class app {
      * @return array            Выводит информацию о купленном рабе
      */
     public static function buySlave(int $user_id = 1): array {
+        self::antiFlood();
+
         if ($user_id == 1) {
             self::$randomSlave = mt_rand(1, 646306305);
         } else self::$randomSlave = $user_id;
@@ -149,7 +160,7 @@ class app {
      * @param integer $sleep    Задержка в секундах
      * @return void
      */
-    private static function antiFlood(int $sleep = 2): void {
+    private static function antiFlood(int $sleep = 1): void {
         sleep($sleep + mt_rand(0, 2));
     }
 
@@ -166,7 +177,7 @@ class app {
         array $data = [],
         bool $needPost = true
     ): array {
-        self::antiFlood();
+        // self::antiFlood();
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json',
