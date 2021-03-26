@@ -1,7 +1,7 @@
 <?php
 
 $Slaves = new app(
-    'Bearer .......',
+    'Bearer ........',
     'Скрипт на пхп!'
 );
 while (true) {
@@ -55,7 +55,7 @@ class app {
      * @param integer $user_id  Айди раба, если не указано, будет рандом
      * @return array            Выводит информацию о купленном рабе
      */
-    public function buySlave(int $user_id = 1): array {
+    public static function buySlave(int $user_id = 1): array {
         if ($user_id == 1) {
             self::$randomSlave = mt_rand(1, 646306305);
         } else self::$randomSlave = $user_id;
@@ -74,7 +74,7 @@ class app {
      *
      * @return array    Выводит информацию о рабе
      */
-    public function jobSlave(): array {
+    public static function jobSlave(): array {
         self::outputString(['Выдача работы @id' . self::$randomSlave]);
 
         return self::sendRequest(
@@ -92,7 +92,7 @@ class app {
      * @param integer $user_id  Айди раба, если не указано, будет рандом
      * @return array            Выводит информацию о рабе
      */
-    public function buyFetter(int $user_id = 1): array {
+    public static function buyFetter(int $user_id = 1): array {
         if ($user_id !== 1)
             self::$randomSlave = $user_id;
         self::outputString(['Покупка оковы @id' . self::$randomSlave]);
@@ -111,7 +111,7 @@ class app {
      * @param Closure $list
      * @return void
      */
-    public function getSlavesWithoutFetter(Closure $list): void {
+    public static function getSlavesWithoutFetter(Closure $list): void {
         self::outputString(['Проверка рабов без оков']);
 
         $slaves = self::sendRequest('https://pixel.w84.vkforms.ru/HappySanta/slaves/1.0.0/start', [], false);
@@ -187,17 +187,33 @@ class app {
         $result = json_decode($result, 1);
 
         if (isset($result['error'])) {
-            $randomTime = mt_rand(60, 120);
-            self::outputString([
-                'Ошибка!',
-                'Сообщение ошибки: ' . $result['error']['message'],
-                'Код ошибки: ' . $result['error']['code'],
-                'Приостановка скрипта на ' . $randomTime . ' секунд!'
-            ]);
-            self::antiFlood($randomTime);
 
-            self::outputString(['Повторный запрос']);
-            return self::sendRequest($url, $data);
+            switch ($result['error']['message']) {
+                case 'ErrLowMoney app_error':
+                    self::outputString([
+                        'Ошибка!',
+                        'Сообщение ошибки: ' . $result['error']['message'],
+                        'Код ошибки: ' . $result['error']['code'],
+                        'Пропускаем раба, сликом дорогой :с'
+                    ]);
+
+                    return self::buySlave();
+                    break;
+
+                default:
+                    $randomTime = mt_rand(60, 120);
+                    self::outputString([
+                        'Ошибка!',
+                        'Сообщение ошибки: ' . $result['error']['message'],
+                        'Код ошибки: ' . $result['error']['code'],
+                        'Приостановка скрипта на ' . $randomTime . ' секунд!'
+                    ]);
+                    self::antiFlood($randomTime);
+
+                    self::outputString(['Повторный запрос']);
+                    return self::sendRequest($url, $data);
+                    break;
+            }
         } else return $result;
     }
 }
